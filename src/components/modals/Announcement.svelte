@@ -94,7 +94,7 @@
                             />
                         {:else}
                             <!-- If file type image then image tag or lottie then  LottiePlayer -->
-                            <img src={artwork} height={300} width={300} />
+                            <img src={artwork} height={300} width={300} alt="" />
                         {/if}
                     {:else}
                         <!-- If file type image then image tag or lottie then  LottiePlayer -->

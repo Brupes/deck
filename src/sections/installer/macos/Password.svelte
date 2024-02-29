@@ -53,6 +53,7 @@
                                 <div class="grid grid-cols-2 gap-6">
                                     <div class="col-span-12">
                                         <div class="mt-1 form-control relative">
+                                            <!-- svelte-ignore a11y-autofocus -->
                                             <input
                                                 autofocus
                                                 bind:value={password}

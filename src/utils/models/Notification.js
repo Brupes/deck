@@ -5,10 +5,31 @@ import { cmdProcess } from "./../store/Notification";
 /**
  * Check if any process is running or not
  */
+export function isProcessRunningForProject(projectName) {
+    return _.get(get(cmdProcess), "projectsProcessing", []).includes(projectName);
+}
+
+/**
+ * Check if any process is running or not
+ */
 export function isProcessRunning() {
     return _.get(get(cmdProcess), "isProcessRunning", false) === true
         ? true
         : false;
+}
+
+/**
+ * Set start the process in store var to manage the process
+ */
+export function startProcessForProject(projectName) {
+    cmdProcess.update((obj) => {
+        obj.title = "Hold on a sec";
+        obj.description = "A process is already running, try after the previous process has ended";
+        obj.cancelButtonText = "Dismiss";
+        obj.show = false;
+        obj.projectsProcessing.push(projectName);
+        return obj;
+    });
 }
 
 /**
@@ -21,6 +42,16 @@ export function startProcess() {
         obj.cancelButtonText = "Dismiss";
         obj.show = false;
         obj.isProcessRunning = true;
+        return obj;
+    });
+}
+
+/**
+ * Stop the process
+ */
+export function stopProcessForProject(projectName) {
+    cmdProcess.update((obj) => {
+        obj.projectsProcessing = obj.projectsProcessing.filter((el) => el !== projectName);
         return obj;
     });
 }

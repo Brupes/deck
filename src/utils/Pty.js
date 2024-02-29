@@ -1,6 +1,7 @@
 const os = require("os");
 const shell = process.env[os.platform() === "win32" ? "COMSPEC" : "SHELL"];
-let pty = require("node-pty");
+const {  ipcRenderer } = require("electron");
+import { nodePtySpawn } from "./Utils"
 
 /**
  * TODO:
@@ -8,12 +9,12 @@ let pty = require("node-pty");
  */
 
 export function getPtyProcess() {
-    return pty.spawn(shell, [], {
+    return nodePtySpawn(shell, [], {
         name: "xterm-color",
         cols: 120,
         rows: 30,
         cwd: process.env.HOME,
-        env: process.env
+        env: process.env,
         // handleFlowControl: true,
     });
 }

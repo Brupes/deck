@@ -34,6 +34,7 @@
             </p>
         </dd>
     </div>
+    <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
     <ul
         tabindex="0"
         class="text-sm text-chillgray-500 p-1 shadow menu dropdown-content bg-base-100 rounded-lg w-auto"
@@ -41,6 +42,7 @@
         {#each containers as container}
             <li class="w-full group">
                 <!-- svelte-ignore a11y-missing-attribute -->
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <a
                     on:click={() => {
                         logIntoShell(stack, container);

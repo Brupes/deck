@@ -1,13 +1,7 @@
 <script>
-    import { afterUpdate } from "svelte";
-    import { createEventDispatcher } from "svelte";
-
     import { requiredValidator } from "./../../../utils/validator/Validators.js";
     import { createFieldValidator } from "./../../../utils/validator/Validation.js";
 
-    import { getWinVmPath } from "./../../../utils/VM";
-
-    const dispatch = createEventDispatcher();
     const { ipcRenderer } = require("electron");
     const _ = require("lodash");
     const [validity, validate] = createFieldValidator(requiredValidator());
@@ -28,7 +22,6 @@
         if (_.isArray(path)) {
             if (path.length > 0 && path[0] != "") {
                 value = path[0];
-                // 
             }
         }
     });
@@ -56,6 +49,7 @@
             <input
                 on:click={selectPath}
                 bind:value
+                readonly
                 placeholder="Please select {inputObject.label}."
                 name={inputField}
                 type="text"
@@ -66,7 +60,7 @@
                     p-0
                     text-gray-500
                     font-normal
-                    focus:outline-none 
+                    focus:outline-none
                     cursor-pointer
                     "
                 class:focus:border-text-coral-500={isValid}

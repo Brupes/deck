@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-const appSettings = require("electron-settings");
+import { getSettingValue, setSettingValue} from "./../utils/Utils";
 const request = require("request");
 
 const announcementApiEndpoint = `https://get-deck.com/announcements/announcements.json`;
@@ -36,7 +36,7 @@ export async function updateAnnouncementView(id) {
 export async function getAnnouncementViewed() {
     let returnObject;
     try {
-        returnObject = await appSettings.get("announcements_viewed");
+        returnObject = await getSettingValue("announcements_viewed");
     } catch (error) {
         returnObject = [];
     }
@@ -50,7 +50,7 @@ export function setAnnouncementViewed(x) {
     let result = false;
     try {
         if (_.isArray(x)) {
-            appSettings.set("announcements_viewed", _.uniq(x));
+            setSettingValue("announcements_viewed", _.uniq(x));
             result = true;
         }
     } catch (error) {

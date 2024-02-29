@@ -37,7 +37,7 @@
                 name={inputField}
                 bind:value={selected}
                 class="
-                col-span-3 border-none justify-self-end p-0 focus:ring-0 text-gray-500  text-right focus:outline-none px-4 w-24 {errorClass}
+                col-span-3 border-none justify-self-end p-0 focus:ring-0 text-gray-500  text-left focus:outline-none px-4 w-24 {errorClass}
                 "
                 disabled={_.get(inputObject, "disabled_post_install", false)}
             >

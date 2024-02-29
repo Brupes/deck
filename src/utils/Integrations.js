@@ -3,14 +3,9 @@ import _ from "lodash";
 import { get } from "svelte/store";
 import { defaultEditorStore, defaultTerminalStore } from "./store/Settings";
 
-const os = require("os");
-const appSettings = require("electron-settings");
+import {getSettingValue, setSettingValue} from "./../utils/Utils";
 const detectEditors = require("detect-editors");
 const detectShells = require("detect-shells");
-const fs = require("fs");
-const { remote } = require("electron");
-const { app } = remote;
-const path = require("path");
 
 const defaultEditorLogo = "img/editors/text-editor.svg";
 const defaultTerminalsLogo = "img/terminals/terminal.svg";
@@ -53,7 +48,7 @@ export function getDirImages(lastDirName = "editors") {
  * Init
  */
 export async function initDefaultEditor() {
-    let defaultEditor = await appSettings.get("settings.defaultEditor");
+    let defaultEditor = await getSettingValue("settings.defaultEditor");
     return defaultEditorStore.update(() => {
         return defaultEditor;
     });
@@ -124,16 +119,16 @@ export async function onEditorChange(editor) {
     defaultEditorStore.update(() => {
         return editor;
     });
-    await appSettings.set("settings.defaultEditor", editor);
+    await setSettingValue("settings.defaultEditor", editor);
     initDefaultEditor();
 
-    let project = await appSettings.get("settings.lastProject");
+    let project = await getSettingValue("settings.lastProject");
 
     if (
         _.get(project, "name", false) &&
         _.get(project, "backTo", false) === "editor"
     ) {
-        appSettings.set("settings.lastProject", null);
+        setSettingValue("settings.lastProject", null);
 
         openEditor(_.get(project, "codePath", false), project);
         router.goto("/stacks/" + project.name);
@@ -156,7 +151,7 @@ export function openEditor(codePath, project = false) {
         detectEditors.launchEditor(get(defaultEditorStore), codePath);
     } else {
         if (project) {
-            appSettings.set("settings.lastProject", {
+            setSettingValue("settings.lastProject", {
                 name: project,
                 codePath: codePath,
                 backTo: "editor",
@@ -170,7 +165,7 @@ export function openEditor(codePath, project = false) {
  * Init Default Terminal
  */
 export async function initDefaultTerminal() {
-    let defaultTerminal = await appSettings.get("settings.defaultTerminal");
+    let defaultTerminal = await getSettingValue("settings.defaultTerminal");
     return defaultTerminalStore.update(() => {
         return defaultTerminal;
     });
@@ -183,16 +178,16 @@ export async function onTerminalChange(data) {
     defaultTerminalStore.update(() => {
         return data;
     });
-    await appSettings.set("settings.defaultTerminal", data);
+    await setSettingValue("settings.defaultTerminal", data);
     initDefaultTerminal();
 
-    let project = await appSettings.get("settings.lastProject");
+    let project = await getSettingValue("settings.lastProject");
 
     if (
         _.get(project, "name", false) &&
         _.get(project, "backTo", false) === "terminal"
     ) {
-        appSettings.set("settings.lastProject", null);
+        setSettingValue("settings.lastProject", null);
 
         openTerminal(_.get(project, "codePath", false), project);
         router.goto("/stacks/" + project.name);
@@ -207,7 +202,7 @@ export function openTerminal(codePath, project = false) {
         detectShells.launchShell(get(defaultTerminalStore), codePath);
     } else {
         if (project) {
-            appSettings.set("settings.lastProject", {
+            setSettingValue("settings.lastProject", {
                 name: project,
                 codePath: codePath,
                 backTo: "terminal",

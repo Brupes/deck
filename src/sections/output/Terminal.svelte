@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { getXtermInstance, fitXterm } from "./../../utils/Xterm";
     import { getPtyProcess } from "./../../utils/Pty";
     import {
@@ -14,6 +14,7 @@
     const fitAddon = xtermInstance.f;
 
     let xtermContainer = null;
+    let isMounted = false;
 
     $: if ($controls.terminal) {
         setTimeout(() => {
@@ -21,20 +22,22 @@
         }, 1500);
     }
 
+    onDestroy(() => {
+        isMounted = false;
+    });
+
     onMount(() => {
-        
+        isMounted = true;
         xtermContainer = document.querySelector("#xterm-terminal");
         if (xtermContainer) {
             xterm.open(xtermContainer);
-            let ptyProcess = getPtyProcess();
+
+            const ptyProcess = getPtyProcess();
 
             ptyProcess.onData((data) => xterm.write(data));
             xterm.onData((data) => ptyProcess.write(data));
 
-            ptyProcess.onExit((code) => {
-                
-                
-            });
+            ptyProcess.onExit((code) => {});
 
             // terminalReader.subscribe((value) => {
             //     xterm.write(value);
@@ -45,9 +48,6 @@
             // });
 
             // xterm.onData((data) => terminalWriter.set(data));
-            
-        } else {
-            
         }
     });
 
@@ -56,7 +56,7 @@
         _.debounce(function (event) {
             fitXterm(fitAddon, xtermContainer);
         }, 1500),
-        true
+        true,
     );
 </script>
 
@@ -65,6 +65,6 @@
     class="
         {$controls.terminal == true ? 'block' : 'hidden'} 
         w-full h-full pt-2
-        text-chillgray-300 text-sm font-mono subpixel-antialiased leading-8 
+        text-chillgray-300 text-sm font-mono subpixel-antialiased leading-8
         overflow-hidden"
 />

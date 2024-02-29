@@ -130,6 +130,7 @@
                 </span>
             </button>
             <ul class="flex justify-center items-center gap-2">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <li
                     class="cursor-pointer px-0.5 py-1.5 text-xs font-semibold 
                     {$controls.output == true ? 'text-white' : 'text-gray-300'}"
@@ -137,6 +138,7 @@
                 >
                     OUTPUT <span class="font-normal ml-1" />
                 </li>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <li
                     class="cursor-pointer px-0.5 py-1.5 mx-1 text-xs font-semibold border-gray-100 
                     {$controls.terminal == true

@@ -8,6 +8,7 @@
     }
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <li on:click={open} class="cursor-pointer group">
     <div class="px-4">
         <div

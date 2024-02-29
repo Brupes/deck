@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-const appSettings = require("electron-settings");
+import {getSettingValue} from "./../utils/Utils";
 let dockerode = require("dockerode");
 
 /**
@@ -22,7 +22,7 @@ export async function getDockerodeObject() {
  * }
  */
 export async function getDockerParams() {
-    let dockerEngine = await appSettings.get("settings.dockerEngine");
+    let dockerEngine = await getSettingValue("settings.dockerEngine");
     
     return _.get(dockerEngine, "remoteEngine", false) &&
         dockerEngine.remoteEngine === true

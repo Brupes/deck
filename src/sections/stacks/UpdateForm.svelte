@@ -127,6 +127,7 @@
         </dl>
     {/if}
 {/each}
+<div style="visibility:collapse">empty</div>
 
 <Tools {projectName} />
 <Extensions

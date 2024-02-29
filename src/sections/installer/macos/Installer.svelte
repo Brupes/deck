@@ -19,7 +19,8 @@
     import { getProjects } from "../../../utils/models/Projects";
     import getStoragePath  from "../../../utils/Utils";
 
-    const { remote, ipcRenderer } = require("electron");
+    const { ipcRenderer } = require("electron");
+    const remote = require('@electron/remote')
     const { app } = remote;
     const { exec } = require("child_process");
     const path = require("path");
@@ -205,6 +206,7 @@
                 </div>
                 <div class="flex flex-col h-auto justify-start py-6 gap-6">
                     <div class="flex">
+                        <!-- svelte-ignore a11y-no-redundant-roles -->
                         <ul role="list" class="">
                             <li>
                                 <div class="relative pb-8">

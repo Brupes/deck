@@ -37,7 +37,7 @@
                     </div>
                 </a>
             </li>
-            <li class="cursor-pointer group px-4">
+            <!-- <li class="cursor-pointer group px-4">
                 <a
                     href="/#/settings/docker-engine"
                     use:active
@@ -72,7 +72,7 @@
                         </div>
                     </div>
                 </a>
-            </li>
+            </li> -->
             <li class="cursor-pointer group px-4">
                 <a
                     href="/#/settings/troubleshoot"

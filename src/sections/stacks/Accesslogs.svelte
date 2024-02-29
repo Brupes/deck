@@ -36,24 +36,24 @@
 >
     <div
         class="
-                        relative
-                        bg-chillblue-200
-                        p-4
-                        shadow-sm
-                        rounded-lg
-                        overflow-hidden
-                        hover:bg-chillblue-300 ease-transition
-                        "
+            relative
+            bg-chillblue-200
+            p-4
+            shadow-sm
+            rounded-lg
+            overflow-hidden
+            hover:bg-chillblue-300 ease-transition
+        "
     >
         <dt>
             <div
                 class="
-                              absolute
-                              bg-chillblue-400
-                              rounded-lg
-                              p-2
-                              right-4
-                              "
+                    absolute
+                    bg-chillblue-400
+                    rounded-lg
+                    p-2
+                    right-4
+                "
             >
                 <svg
                     fill="currentColor"
@@ -70,12 +70,12 @@
             </div>
             <p
                 class="
-                              mr-16
-                              text-lg
-                              font-medium
-                              text-chillblue-500
-                              truncate
-                              "
+                    mr-16
+                    text-lg
+                    font-medium
+                    text-chillblue-500
+                    truncate
+                "
             >
                 Logs
             </p>
@@ -86,6 +86,7 @@
             </p>
         </dd>
     </div>
+    <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
     <ul
         tabindex="0"
         class="text-sm text-chillgray-500 p-1 shadow menu dropdown-content bg-base-100 rounded-lg w-auto"
@@ -93,6 +94,7 @@
         {#each containers as container}
             <li class="w-full group">
                 <!-- svelte-ignore a11y-missing-attribute -->
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <a
                     on:click={() => {
                         accessLogs(container);

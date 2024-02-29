@@ -1,11 +1,22 @@
 import _ from "lodash";
 
-const { remote } = require("electron");
-
+const remote = require('@electron/remote')
 const { app } = remote;
-const { shell } = require("electron");
+const { shell, ipcRenderer } = require("electron");
 const fs = require("fs");
 const os = require("os");
+
+export function nodePtySpawn(file, args, options) {
+    return remote.getGlobal('nodePty').spawn(file, args, options)
+}
+
+export async function getSettingValue(...args) {
+    return await ipcRenderer.invoke('getSettingValue', ...args)
+}
+
+export async function setSettingValue(...args) {
+    return await ipcRenderer.invoke('setSettingValue', ...args)
+}
 
 export default function getStoragePath() {
     let home = app.getPath("home");
@@ -63,14 +74,14 @@ export function openProjectInTerminal(projectName) {
             "Terminal",
             getStackPath(projectName),
         ]);
-        openTerminalAtPath.on("error", (err) => {});
+        openTerminalAtPath.on("error", (err) => { });
     } else {
         let child_process = require("child_process");
         child_process.exec(
             "start " +
-                process.env.SHELL +
-                " /K cd /D " +
-                getStackPath(projectName)
+            process.env.SHELL +
+            " /K cd /D " +
+            getStackPath(projectName)
         );
     }
 }
@@ -88,11 +99,11 @@ export function openTerminal(pathToOpen) {
     } else if (os.platform() === "darwin") {
         let { spawn } = require("child_process");
         let openTerminalAtPath = spawn("open", ["-a", "Terminal", pathToOpen]);
-        openTerminalAtPath.on("error", (err) => {});
+        openTerminalAtPath.on("error", (err) => { });
     } else if (os.platform() === "linux") {
         const { spawn } = require("child_process");
         let openTerminalAtPath = spawn("gnome-terminal", { cwd: pathToOpen });
-        openTerminalAtPath.on("error", (err) => {});
+        openTerminalAtPath.on("error", (err) => { });
     } else {
         let child_process = require("child_process");
         child_process.exec(

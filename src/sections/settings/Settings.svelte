@@ -35,9 +35,9 @@
         <div class="flex-1 flex items-stretch overflow-hidden">
             <Options />
             <Route path="/" redirect="/settings/integrations" />
-            <Route path="/docker-engine">
+            <!-- <Route path="/docker-engine">
                 <DockerEngine />
-            </Route>
+            </Route> -->
             <Route path="/troubleshoot">
                 <Troubleshoot />
             </Route>

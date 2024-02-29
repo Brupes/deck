@@ -29,7 +29,7 @@
             )}" && docker-compose exec ${container} ${cmd}`;
         }
 
-        run(command).then(
+        run(command, undefined, true, projectName).then(
             (ptyProcess) => {
                 ptyProcess.onExit(() => {
                     execInProgress = false;

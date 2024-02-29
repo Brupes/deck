@@ -3,7 +3,7 @@ import { getDockerodeObject } from "./../Dockerode";
 
 const net = require('net');
 const request = require("request");
-const appSettings = require("electron-settings");
+import { getSettingValue, } from "./../Utils";
 
 export const getConnectionStatus = function (host, port) {
     return new Promise(function (resolve, reject) {
@@ -132,7 +132,7 @@ const startDocker = function () {
  * }
  */
 export async function checkStackHealth(project, projectLocalPort, pma) {
-    let host = await appSettings.get("settings.dockerEngine.host");
+    let host = await getSettingValue("settings.dockerEngine.host");
 
     let res = {
         status: false,

@@ -12,7 +12,7 @@ import { settingsStore } from "./../store/Settings";
 /**
  * Declaration of constant variables
  */
-const appSettings = require("electron-settings");
+import {getSettingValue, setSettingValue} from "./../Utils";
 const os = require("os");
 
 /**
@@ -20,7 +20,7 @@ const os = require("os");
  * @description : Initialization of electron settings to store variable
  */
 export async function initDockerEngineSettings() {
-    let data = await appSettings.get("settings");
+    let data = await getSettingValue("settings");
     let defaultSettings = getDefaultSettings();
 
     if (_.get(data, "dockerEngine", false)) {
@@ -53,7 +53,7 @@ export async function initDockerEngineSettings() {
  * @param {String} value
  */
 export async function setSettings(key, value) {
-    await appSettings.set(key, value);
+    await getSettingValue(key, value);
     await initDockerEngineSettings();
 }
 
@@ -93,26 +93,28 @@ export function getDefaultSettings() {
  */
 export async function getDockerEngine() {
     let defaultSettings = getDefaultSettings();
-    let settings = await appSettings.get("settings.dockerEngine");
+    let settings = await getSettingValue("settings.dockerEngine");
+    //TODO: force remote engine to false
+    settings.remoteEngine = undefined;
     if (!_.get(settings, "remoteEngine", false)) {
-        await appSettings.set(
+        await setSettingValue(
             "settings.dockerEngine.remoteEngine",
             defaultSettings.dockerEngine.remoteEngine
         );
     }
     if (!_.get(settings, "host", false)) {
-        await appSettings.set(
+        await setSettingValue(
             "settings.dockerEngine.host",
             defaultSettings.dockerEngine.host
         );
     }
     if (!_.get(settings, "port", false)) {
-        await appSettings.set(
+        await setSettingValue(
             "settings.dockerEngine.port",
             defaultSettings.dockerEngine.port
         );
     }
-    settings = await appSettings.get("settings.dockerEngine");
+    settings = await getSettingValue("settings.dockerEngine");
 
     settingsStore.update((storeData) => {
         storeData.remoteEngine = settings.remoteEngine;
@@ -120,7 +122,7 @@ export async function getDockerEngine() {
         storeData.port = settings.port;
         return storeData;
     });
-
+    
     return settings;
 }
 
@@ -134,7 +136,7 @@ export async function getDockerEngine() {
  * }
  */
 export async function getHost() {
-    let host = await appSettings.get("settings.dockerEngine.host");
+    let host = await getSettingValue("settings.dockerEngine.host");
     if (host === undefined) {
         host = "127.0.0.1";
         // if (os === "win32") {

@@ -3,7 +3,7 @@
     import Alert from "./../../components/modals/Alert.svelte";
     import Notification from "./../../components/notification/Notification.svelte";
     import run from "./../../utils/RunCommand";
-    import getStoragePath from "./../../utils/Utils";
+    import getStoragePath, { setSettingValue} from "./../../utils/Utils";
     import { resetProject } from "./../../utils/models/Projects";
 
     import {
@@ -18,7 +18,6 @@
     // IPC renderer const decliration
     const { ipcRenderer } = require("electron");
     const rimraf = require("rimraf");
-    const appSettings = require("electron-settings");
 
     let alertObject = {
         title: "Deactivate account",
@@ -118,11 +117,11 @@
                                 type: "success",
                                 show: true,
                             };
-                            await appSettings.set(
+                            await setSettingValue(
                                 "settings.dockerEngine.remoteEngine",
                                 false
                             );
-                            await appSettings.set(
+                            await setSettingValue(
                                 "settings.dockerEngine.host",
                                 "127.0.0.1"
                             );

@@ -9,7 +9,7 @@ import { setIndicatorColor } from "./Indicator";
 const { ipcRenderer } = require("electron");
 
 export default function start(project) {
-    run(`cd "${getStackPath(project)}" ; ${DOCKER_COMPOSE_UP}`).then(
+    run(`cd "${getStackPath(project)}" ; ${DOCKER_COMPOSE_UP}`, undefined, true, project).then(
         (ptyProcess) => {
             headerLoaderStore.update((obj) => {
                 obj.loading = true;

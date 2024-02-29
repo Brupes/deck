@@ -207,10 +207,10 @@
         <div class="flex-shrink-0 flex justify-center pb-5">
             <Announcement />
         </div>
-        <!-- <div class="flex-shrink-0 flex py-1 bg-chillgray-700">
+        <div class="flex-shrink-0 flex py-1 bg-chillgray-700">
             <p class="text-center mx-auto text-xs text-white font-medium">
                 {appVersion}
             </p>
-        </div> -->
+        </div>
     </div>
 </div>

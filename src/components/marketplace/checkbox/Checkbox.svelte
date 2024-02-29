@@ -2,7 +2,6 @@
     const _ = require("lodash");
 
     export let inputObject;
-    export let error;
     export let value = false;
 </script>
 

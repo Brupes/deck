@@ -88,6 +88,7 @@
                 >
             </div>
             <div class="bg-gray-100 p-2 rounded-md">
+                <!-- svelte-ignore a11y-no-redundant-roles -->
                 <ul role="list" class="flex flex-wrap gap-2">
                     {#each res as container}
                         <li
@@ -122,6 +123,7 @@
                                         <DisabledOpenLink />
                                     {:then res}
                                         {#if res.connection === true}
+                                            <!-- svelte-ignore a11y-click-events-have-key-events -->
                                             <div
                                                 on:click={() => {
                                                     // openExternal(
@@ -160,6 +162,7 @@
                                         <DisabledOpenLink />
                                     {/await}
                                     <!--  -->
+                                    <!-- svelte-ignore a11y-click-events-have-key-events -->
                                     <div
                                         class="flex-none p-1 rounded-md text-gray-400 hover:bg-gray-100 ease-transition cursor-pointer"
                                         on:click={() =>

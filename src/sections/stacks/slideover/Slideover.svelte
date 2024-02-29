@@ -26,7 +26,7 @@
     export let show = false;
     export let projectName;
 
-    const { dialog } = require("electron").remote;
+    const { dialog } = require('@electron/remote');
     const os = require("os");
 
     let notificationObject = {

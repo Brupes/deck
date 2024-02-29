@@ -32,9 +32,6 @@
     } from "./utils/Integrations";
     import { showContextMenu } from "./utils/context-menu/Projects";
 
-    const { remote } = require("electron");
-    const { app } = remote;
-    const os = require("os");
     const { ipcRenderer } = require("electron");
 
     let showSidebar = true;

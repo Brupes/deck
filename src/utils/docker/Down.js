@@ -17,7 +17,7 @@ const rimraf = require("rimraf");
  */
 export default function down(project) {
     return new Promise(function (resolve, reject) {
-        run(`cd "${getStackPath(project)}" ; ${DOCKER_COMPOSE_DOWN}`).then(
+        run(`cd "${getStackPath(project)}" ; ${DOCKER_COMPOSE_DOWN}`, undefined, true, project).then(
             (ptyProcess) => {
                 ptyProcess.on("exit", (response) => {
                     setIndicatorColor(project).then((res) => {

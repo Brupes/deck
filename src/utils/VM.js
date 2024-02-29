@@ -15,12 +15,12 @@ const rimraf = require("rimraf");
 const sudo = require("sudo-prompt");
 
 export function hasRemoteEngine() {
+    return true;
     return _.get(get(settingsStore), "remoteEngine", false);
 }
 
 //Mounts user selected path to the VM
-export function mountPath(localPath, projectName) {
-    //path: /Users/sfx101/my-project
+export async function mountPath(localPath, projectName) {
     return new Promise((resolve, reject) => {
         if (os.platform() === "win32") {
             getWinVmPath(localPath, projectName).then(
@@ -61,25 +61,11 @@ export function mountPath(localPath, projectName) {
     });
 }
 
-// @TODO: Remove after final new function getWinVmPath
-// export function getWinVmPath(localPath) {
-//     let resultPath = "",
-//         resultPathArr = [];
-//     resultPath = _.replace(localPath, ":", "");
-//     resultPathArr = resultPath.split("\\");
-//     if (_.get(resultPathArr, "[0]", "")) {
-//         resultPathArr[0] = _.toLower(resultPathArr[0]);
-//     }
-//     resultPath = "/mnt/" + resultPathArr.join("/");
-//     return resultPath;
-// }
-
 export function getWinVmPath(localPath, projectName) {
     return new Promise(async function (resolve, reject) {
         isEmptyDir(localPath).then(
-            (response) => {
+            async (response) => {
                 if (response === true) {
-
                     // Empty folder logic
                     createSymlink(localPath, projectName).then(
                         (res) => {
@@ -96,8 +82,8 @@ export function getWinVmPath(localPath, projectName) {
                         }
                     );
                 } else {
-                    //
-                    reject('The selected project path is not empty, select an empty path');
+                    resolve(localPath);
+                    // reject('The selected project path is not empty, select an empty path');
                     // let path1 = getLocalDriveToWslMntPath(localPath);
                     // let path2 =
                     //     "/" + ["home", "deck-projects", projectName].join("/");
@@ -146,41 +132,65 @@ function createSymlink(localPath, projectName) {
         let options = {
             name: "DECK"
         };
-        let returnData = "/" + ["home", "deck-projects", projectName].join("/");
-        let makeLinkCommend =
-            `mklink /D "` +
-            localPath +
-            `" "\\\\wsl$\\deck-app\\home\\deck-projects\\` +
-            projectName +
-            `"`;
+        // let returnData = "/" + ["home", "deck-projects", projectName].join("/");
+        const newPath = `\\\\wsl$\\deck-app\\home\\deck-projects\\${projectName}`
+        const returnData = newPath
 
-        // Get status of folder delete
-        let deleteFolderStatus = await deleteFolder(localPath);
+        if (localPath.startsWith('\\\\wsl$\\deck-app') && localPath !== newPath) {
+            let command =
+                `wsl -d deck-app mv "${localPath}" "${newPath}"`;
 
-        if (deleteFolderStatus === true) {
             sudo.exec(
-                makeLinkCommend,
+                command,
                 options,
                 function (error, stdout, stderr) {
                     if (error) {
                         reject({
-                            message: "Something is wrong, mklink failed.",
+                            message: "Something is wrong, mv failed.",
                             data: error
                         });
                     } else {
                         resolve({
-                            message: "Link successfully created.",
+                            message: "Folder successfully moved.",
                             path: returnData,
                             status: 100
                         });
                     }
                 }
             );
-        } else {
-            reject({
-                message: "Something is wrong. Folder delete failed",
-                data: deleteFolderStatus,
-            });
+        }
+        else {
+            let command =
+                `mklink /D "${localPath}" "${newPath}"`;
+
+            // Get status of folder delete
+            let deleteFolderStatus = await deleteFolder(localPath);
+
+            if (deleteFolderStatus === true) {
+                sudo.exec(
+                    command,
+                    options,
+                    function (error, stdout, stderr) {
+                        if (error) {
+                            reject({
+                                message: "Something is wrong, mklink failed.",
+                                data: error
+                            });
+                        } else {
+                            resolve({
+                                message: "Link successfully created.",
+                                path: returnData,
+                                status: 100
+                            });
+                        }
+                    }
+                );
+            } else {
+                reject({
+                    message: "Something is wrong. Folder delete failed",
+                    data: deleteFolderStatus,
+                });
+            }
         }
     });
 }

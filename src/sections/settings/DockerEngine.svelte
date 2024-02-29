@@ -8,8 +8,7 @@
     import { onMount } from "svelte";
     import { settingsStore } from "./../../utils/store/Settings";
     import { initDockerEngineSettings } from "./../../utils/models/Settings";
-
-    const appSettings = require("electron-settings");
+    import { setSettingValue } from "./../../utils/Utils"
 
     /**
      * Init settings when load the page
@@ -23,7 +22,7 @@
      */
     async function setRemoteEngine() {
         $settingsStore.remoteEngine = !$settingsStore.remoteEngine;
-        appSettings.set(
+        setSettingValue(
             "settings.dockerEngine.remoteEngine",
             $settingsStore.remoteEngine
         );

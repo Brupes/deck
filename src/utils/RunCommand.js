@@ -5,19 +5,19 @@ import {
     animateOutputError,
 } from "./Motion";
 import { get } from "svelte/store";
-import { settingsStore } from "../utils/store/Settings";
+import { settingsStore } from "./store/Settings";
 import {
-    isProcessRunning,
-    startProcess,
-    stopProcess,
+    isProcessRunningForProject,
+    startProcessForProject,
+    stopProcessForProject,
     showProcessAlert,
-} from "./../utils/models/Notification";
+} from "./models/Notification";
+import { nodePtySpawn } from "./Utils"
 
-const { remote } = require("electron");
+const remote = require('@electron/remote')
 const { app } = remote;
 const path = require("path");
 const os = require("os");
-const pty = require("node-pty");
 const _ = require("lodash");
 const platform = os.platform();
 
@@ -50,13 +50,13 @@ function importDockerCompose(cmd) {
     return cmd;
 }
 
-export default function run(command, exit, canManageProcess = true) {
+export default function run(command, exit, canManageProcess = true, projectName = "") {
     return new Promise(function (resolve, reject) {
-        if (isProcessRunning() === false || canManageProcess === false) {
+        if (isProcessRunningForProject(projectName) === false || canManageProcess === false) {
             command = importDockerCompose(command);
 
             if (canManageProcess) {
-                startProcess();
+                startProcessForProject(projectName);
             }
 
             if (platform === "win32") {
@@ -65,7 +65,7 @@ export default function run(command, exit, canManageProcess = true) {
                 command = `echo -e '\\x1bc' && ${command}`;
             }
 
-            let ptyProcess = pty.spawn(shell, [], {
+            let ptyProcess = nodePtySpawn(shell, [], {
                 name: "xterm-color",
                 cols: 80,
                 rows: 30,
@@ -90,7 +90,7 @@ export default function run(command, exit, canManageProcess = true) {
 
             ptyProcess.on("exit", (code) => {
                 if (canManageProcess) {
-                    stopProcess();
+                    stopProcessForProject(projectName);
                 }
                 if (code === 0) {
                     animateOutputSuccess();

@@ -20,7 +20,7 @@ export default function restart(project, loaderMessage = false) {
         });
 
         updateStatusInStore(project, true);
-        run(`cd "${getStackPath(project)}" ; ${DOCKER_COMPOSE_RESTART}`).then(
+        run(`cd "${getStackPath(project)}" ; ${DOCKER_COMPOSE_RESTART}`, undefined, true, project).then(
             (ptyProcess) => {
                 ptyProcess.on("exit", (exitCode) => {
                     ipcRenderer.send("dock-bounce", { type: "informational" });

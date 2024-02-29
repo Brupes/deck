@@ -43,12 +43,14 @@
             <p class="text-xs text-beach-600">Preview app on your browser</p>
         </dd>
     </div>
+    <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
     <ul
         tabindex="0"
         class="text-sm text-chillgray-500 p-1 shadow menu dropdown-content bg-base-100 rounded-lg w-auto overflow-visible"
     >
         <li class="w-full dropdown dropdown-right group overflow-visible">
             <!-- svelte-ignore a11y-missing-attribute -->
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
                 on:click={() => {
                     shell.openExternal(`https:${stack}.stacks.run`);
@@ -106,6 +108,7 @@
         </li>
         <li class="w-full dropdown dropdown-right group overflow-visible">
             <!-- svelte-ignore a11y-missing-attribute -->
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
                 on:click={() => {
                     shell.openExternal(

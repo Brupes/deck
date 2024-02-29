@@ -9,9 +9,8 @@ import { settingsStore } from "./../store/Settings";
 /**
  * Constant variables
  */
-const logger = require("electron-timber");
 const { exec } = require("child_process");
-const { remote } = require("electron");
+const remote = require('@electron/remote')
 const { app } = remote;
 const path = require("path");
 const os = require("os");

@@ -342,7 +342,7 @@ async function getDataPathHost(stackName) {
     if (hasRemoteEngine()) {
         if (isWindows) {
             // path = getLocalDriveToWslMntPath(localPath);
-            path = `/home/volumes/${stackName}`;
+            path = `\\\\wsl$\\deck-app\\home\\volumes\\${stackName}`;
         } else if (isMac) {
             path = `/home/ubuntu/volumes/${stackName}`;
         } else {

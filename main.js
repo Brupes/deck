@@ -1,22 +1,28 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, globalShortcut } = require("electron");
 const { Tray, nativeImage } = require("electron");
-const logger = require("electron-timber");
-const { autoUpdater } = require("electron-updater");
+const logger = require('electron-log/main');
+// const { autoUpdater } = require("electron-updater");
 const serve = require("electron-serve");
 const loadURL = serve({ directory: "public" });
 const _ = require("lodash");
 const isPortReachable = require("is-port-reachable");
 const path = require("path");
 const domain = ".stacks.run";
-const wsl = require("./wsl");
+const wsl = require("./resources/wsl");
 const os = require("os");
-const settings = require("electron-settings");
+const pty = require("node-pty");
+
 const { powerSaveBlocker } = require("electron");
+
+const config = require('electron-json-config').factory(`${app.getPath("home")}/.deck/settings.json`);
 
 let tray = null;
 let mainWindow;
 let forceQuit = false;
 let proxy;
+
+require('@electron/remote/main').initialize()
+logger.initialize();
 
 function isDev() {
     return !app.isPackaged;
@@ -25,20 +31,40 @@ function isDev() {
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        show: false,
         width: 1280,
         height: 720,
         minWidth: 1280,
         minHeight: 720,
-        // titleBarStyle: 'hidden',
         autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: true,
+            nodeIntegrationInSubFrames: true,
+            // preload: path.join(__dirname, 'preload.js'),
             devTools: true,
-            contextIsolation: false,
-            enableRemoteModule: true,
+            contextIsolation: false
         },
+        icon: path.join(__dirname, 'public/favicon.png'),
+        show: false,
     });
+
+    require("@electron/remote/main").enable(mainWindow.webContents)
+
+    // This block of code is intended for development purpose only.
+    // Delete this entire block of code when you are ready to package the application.
+    if (isDev()) {
+        mainWindow.loadURL('http://localhost:8080/');
+    } else {
+        loadURL(mainWindow);
+    }
+
+    // Uncomment the following line of code when app is ready to be packaged.
+    // loadURL(mainWindow);
+
+    if (isDev()) {
+        // Open the DevTools and also disable Electron Security Warning.
+        process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+        mainWindow.webContents.openDevTools();
+    }
 
     mainWindow.on("close", function (event) {
         logger.log("App id quiting: ", forceQuit);
@@ -51,25 +77,17 @@ function createWindow() {
             app.quit();
         }
     });
-    // win.maximize();
-    // and load the index.html of the app.
-    if (isDev()) {
-        mainWindow.loadURL("http://localhost:5000/");
-    } else {
-        loadURL(mainWindow);
-    }
 
     mainWindow.once("ready-to-show", () => {
         mainWindow.show();
-        autoUpdater.checkForUpdatesAndNotify();
+        // autoUpdater.checkForUpdatesAndNotify();
     });
 
-    mainWindow.once('focus', () => {
-        logger.log('mainWindow focused');
-    });
+    global.nodePty = pty
 
-    // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    // mainWindow.once('focus', () => {
+    //     logger.log('mainWindow focused');
+    // });
 }
 
 // This method will be called when Electron has finished
@@ -78,7 +96,6 @@ function createWindow() {
 app.whenReady().then(function () {
     // Add icons and context menus to the system's notification area.
     initTray();
-    app.allowRendererProcessReuse = false;
     createWindow();
 });
 
@@ -99,10 +116,7 @@ app.on("activate", () => {
     mainWindow.show();
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    // if (BrowserWindow.getAllWindows().length === 0) {
-    //     logger.log("Showing window...")
-    //     mainWindow.show();
-    // }
+    // if (mainWindow === null) createWindow()
 });
 
 app.on("before-quit", function () {
@@ -120,27 +134,27 @@ app.on("will-finish-launching", function () {
 });
 
 //Auto updater events
-autoUpdater.on('checking-for-update', () => {
-    sentUpdatesToRenderer('Checking for update...');
-})
-autoUpdater.on('update-available', (info) => {
-    sentUpdatesToRenderer('Update available.');
-})
-autoUpdater.on('update-not-available', (info) => {
-    sentUpdatesToRenderer('Update not available.');
-})
-autoUpdater.on('error', (err) => {
-    sentUpdatesToRenderer('Error in auto-updater. ' + err);
-})
-autoUpdater.on('download-progress', (progressObj) => {
-    let log_message = "Download speed: " + progressObj.bytesPerSecond;
-    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-    sentUpdatesToRenderer(log_message);
-})
-autoUpdater.on('update-downloaded', (info) => {
-    sentUpdatesToRenderer('Update downloaded');
-});
+// autoUpdater.on('checking-for-update', () => {
+//     sentUpdatesToRenderer('Checking for update...');
+// })
+// autoUpdater.on('update-available', (info) => {
+//     sentUpdatesToRenderer('Update available.');
+// })
+// autoUpdater.on('update-not-available', (info) => {
+//     sentUpdatesToRenderer('Update not available.');
+// })
+// autoUpdater.on('error', (err) => {
+//     sentUpdatesToRenderer('Error in auto-updater. ' + err);
+// })
+// autoUpdater.on('download-progress', (progressObj) => {
+//     let log_message = "Download speed: " + progressObj.bytesPerSecond;
+//     log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+//     log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+//     sentUpdatesToRenderer(log_message);
+// })
+// autoUpdater.on('update-downloaded', (info) => {
+//     sentUpdatesToRenderer('Update downloaded');
+// });
 
 function sentUpdatesToRenderer(message, event = 'auto-updater') {
     mainWindow.webContents.send(event, message);
@@ -198,7 +212,7 @@ ipcMain.handle("power-saving", async (event, arg) => {
 });
 
 ipcMain.on("register-proxy", async (event, data) => {
-    let dockerEngine = await settings.get("settings.dockerEngine");
+    let dockerEngine = await config.get("settings.dockerEngine");
     logger.log("Receiving proxy args from renderer");
     logger.log(data); // prints "ping"
     logger.log(`http://${dockerEngine.host}:`);
@@ -248,8 +262,15 @@ ipcMain.on("dock-bounce", (event, data) => {
     }
 });
 
+ipcMain.handle('getSettingValue', (event, ...args) => {
+    return config.get(...args);
+});
 
-async function initialize(path) {
+ipcMain.handle('setSettingValue', (event, ...args) => {
+    return config.set(...args);
+});
+
+function initialize(path) {
     logger.log("Received path ", path);
     proxy = require("redbird")({
         port: 80,
@@ -258,13 +279,13 @@ async function initialize(path) {
             key: `${path}/storage/certs/dev-key.pem`,
             cert: `${path}/storage/certs/dev-cert.pem`,
         },
-        bunyan: (isDev()) ? true : false,
+        bunyan: (isDev()) ? true : false
     });
 }
 
-async function register(data) {
+function register(data) {
     logger.log("Received data ", data);
-    let dockerEngine = await settings.get("settings.dockerEngine");
+    let dockerEngine = config.get("settings.dockerEngine");
     let host = _.has(dockerEngine, "host") ? dockerEngine.host : "localhost";
     _.forOwn(data, function (value, key) {
         if (value.STACK_HTTP_PORT) {
@@ -280,7 +301,7 @@ async function register(data) {
  * WSL run on windows system
  */
 async function runWsl() {
-    let dockerEngine = await settings.get("settings.dockerEngine");
+    let dockerEngine = await config.get("settings.dockerEngine");
 
     if (dockerEngine.remoteEngine && os.platform() === "win32") {
         wsl.runWSLDaemon("wsl -d deck-app dockerd");

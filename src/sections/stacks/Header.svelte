@@ -18,7 +18,6 @@
     } from "./../../utils/Integrations";
 
     import Notification from "./../../components/notification/Notification.svelte";
-    import { getSelectedNetwork } from "./../../utils/models/Networks";
     import { controls } from "../../utils/Store";
     import {
         formFieldsStore,
@@ -49,7 +48,6 @@
         show: false,
     };
 
-    let selectedNetwork = getSelectedNetwork(projectName);
     let stackObject = getProjectDetails(projectName);
 
     $: {

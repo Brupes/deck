@@ -7,7 +7,7 @@ import { updateStatusInStore } from "./ButtonLoader";
 import { headerLoaderStore } from "./../store/Projects";
 
 export default function stop(project) {
-    run(`cd "${getStackPath(project)}" ; ${DOCKER_COMPOSE_STOP}`).then(
+    run(`cd "${getStackPath(project)}" ; ${DOCKER_COMPOSE_STOP}`, undefined, true, project).then(
         (ptyProcess) => {
             headerLoaderStore.update((obj) => {
                 obj.loading = true;

@@ -41,4 +41,5 @@ export let cmdProcess = writable({
     cancelButtonText: "Dismiss",
     show: false,
     isProcessRunning: false,
+    projectsProcessing: []
 });

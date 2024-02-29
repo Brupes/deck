@@ -21,7 +21,8 @@
     import { iSWSL2Installed } from "../../utils/WSL2";
     import { getAllAnnouncements } from "./../../utils/Announcements";
 
-    const { ipcRenderer, remote } = require("electron");
+    const { ipcRenderer} = require("electron");
+    const remote = require('@electron/remote')
     const os = require("os");
     const { exec } = require("child_process");
     const { app } = remote;
@@ -36,7 +37,7 @@
     onMount(async () => {
         // Init announcements
         await getAllAnnouncements();
-
+        
         // Initialization configurations for app run
         setTimeout(() => {
             initializationBeforeStart();
@@ -75,14 +76,25 @@
         let WSLStatus = await iSWSL2Installed();
         console.log(
             `🚀 LOG | file: Entrypoint.svelte | line 77 | initializationBeforeStart | WSLStatus`,
-            WSLStatus
+            WSLStatus,
         );
 
         // .deck Initialization
         await dockerStackInitialization();
+        
+        if (os.platform() === "win32") {
+            if (!WSLStatus.wsl2) {
+                router.goto("/installer/wsl-status");
+                return;
+            } else if (!WSLStatus.deck) {
+                router.goto("/installer");
+                return;
+            }
+        }
 
         // RemoteEngine is defined & True?
         if (
+            false &&
             _.get(dockerEngine, "remoteEngine", false) &&
             dockerEngine.remoteEngine === true
         ) {
@@ -103,10 +115,7 @@
                 },
             });
             router.goto("/stacks");
-        } else {
-            // if (os.platform() === 'win32' && WSLStatus.wsl2 === null) router.goto("/installer/wsl-status");
-            // else router.goto("/installer");
-
+        } else {            
             // @TODO: support for Docker Desktop in next version
             // Docker desktop checks
             IsDockerDesktopRunning()
@@ -123,7 +132,7 @@
                             // 1st time user
                             // Go to /installer
                             console.trace();
-                            router.goto("/installer");
+                            // router.goto("/installer");
                         });
                 });
         }

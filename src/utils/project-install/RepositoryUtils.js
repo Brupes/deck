@@ -10,7 +10,7 @@ const fs = require("fs");
 const yaml = require("js-yaml");
 const download = require("download-git-repo");
 const semver = require("semver");
-const logger = require("electron-timber");
+const logger = require('electron-log/main');
 const request = require("request");
 const path = require("path");
 

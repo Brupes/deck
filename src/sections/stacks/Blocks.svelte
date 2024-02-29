@@ -31,6 +31,7 @@
     }
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <li
     class="cursor-pointer"
     on:click={() => {
@@ -92,7 +93,7 @@
                                         />
                                     </svg>
                                 {:else if isProjectStarted}
-                                    <!-- <button
+                                    <button
                                         on:click={() =>
                                             stop(stack.COMPOSE_PROJECT_NAME)}
                                         class="text-right flex justify-end"
@@ -115,9 +116,9 @@
                                                 clip-rule="evenodd"
                                             />
                                         </svg>
-                                    </button> -->
+                                    </button>
                                 {:else}
-                                    <!-- <button
+                                    <button
                                         on:click={() =>
                                             start(stack.COMPOSE_PROJECT_NAME)}
                                         class="text-right flex justify-end"
@@ -140,7 +141,7 @@
                                                 clip-rule="evenodd"
                                             />
                                         </svg>
-                                    </button> -->
+                                    </button>
                                 {/if}
 
                                 <button class="text-right flex ">

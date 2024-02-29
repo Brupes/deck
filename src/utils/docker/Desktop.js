@@ -12,7 +12,7 @@ export function launchDockerDesktop() {
         } else {
             //TODO: accurate path detection on windows
             let dockerDesktopPath = path.join('C:\\', 'Program Files', 'Docker', 'Docker', 'Docker Desktop.exe');
-            launchCmd = `cmd /C ${dockerDesktopPath}`;
+            launchCmd = `cmd /C "${dockerDesktopPath}"`;
         }
 
         exec(launchCmd, (error, stdout, stderr) => {

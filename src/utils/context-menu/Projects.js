@@ -16,8 +16,10 @@ import {
     getDefaultTerminalLogo
 } from "../Integrations";
 import { openCodePath, getStackPath } from "../../utils/Utils";
+import { router } from "tinro";
 
-const { remote, shell } = require("electron");
+const { shell } = require("electron");
+const remote = require('@electron/remote')
 const { Menu, MenuItem } = remote;
 const os = require('os');
 
@@ -126,6 +128,7 @@ export function showContextMenu(e) {
             {
                 label: 'Delete project',
                 click: function () {
+                    router.goto("/project/delete/" + projectName);
                 }
             },
         ];

@@ -49,21 +49,11 @@ export default async function saveNewProject(data, image, settings) {
     // Save project on stack file for listing
     await saveProjectOnStackFile(stackName, image, envData, data);
 
-    //
     if (_.get(data, "network_driver", false)) {
         await updateDockerComposeYml(stackName, data["network_driver"]);
     }
 
     if (get(docker_custom_domain) && _.get(envData, "httpPort", false)) {
-        //Register redbird proxy
-        // proxy.send({
-        //     action: "init",
-        //     args: {
-        //         stack: stackName,
-        //         port: envData.httpPort,
-        //     },
-        // });
-
         ipcRenderer.send("register-proxy", {
             action: "register",
             args: {

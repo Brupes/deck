@@ -5,9 +5,7 @@
 
     export let inputObject;
     export let inputField;
-    export let error;
     export let value = [];
-    // export let iconClass = "fas fa-code-branch";
 
     let listShow = false,
         checkedValues = [],

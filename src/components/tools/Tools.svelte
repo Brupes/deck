@@ -32,6 +32,13 @@
         "composer clear-cache",
     ];
 
+    let npmTools = [
+        "npm install",
+        "npm update",
+        "npm run prod",
+        "npm run watch",
+    ];
+
     let laravelTools = [
         "artisan key:generate",
         "artisan migrate",
@@ -67,7 +74,16 @@
             <div class="text-gray-400 text-xs">
                 Run commands in the project by clicking on the buttons
             </div>
-
+            
+            <div class="flex flex-wrap gap-2 py-2">
+                {#each npmTools as npmTool}
+                    <Button
+                        cmd={npmTool}
+                        containers={project.containers}
+                        {projectName}
+                    />
+                {/each}
+            </div>
             <div class="flex flex-wrap gap-2 py-2">
                 {#each composerTools as composerTool}
                     <Button

@@ -22,8 +22,8 @@ export function connections(projectName) {
             dockerode.listContainers(
                 {
                     filters: {
-                        name: [projectName],
-                        // status: ["exited", "running", "dead", "paused"],
+                        name: [`/${projectName}-`],
+                        status: ["exited", "running", "dead", "paused"],
                     },
                 },
                 async function (err, containers) {
@@ -31,6 +31,7 @@ export function connections(projectName) {
 
                     let privateHostName = await getHost();
                     try {
+                        console.log(containers, projectName)
                         _.forEach(containers, function (container) {
                             console.log(
                                 "🚀 LOG | file: Container.js | line 38 | container",

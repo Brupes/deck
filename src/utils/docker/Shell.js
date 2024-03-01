@@ -5,6 +5,7 @@ import _ from "lodash";
 import { get } from "svelte/store";
 import { getStackPath } from "./../Utils";
 import { settingsStore } from "./../store/Settings";
+import run from "../RunCommand"
 
 /**
  * Constant variables
@@ -40,7 +41,8 @@ export default function LogIntoShell(projectName, container) {
  * @returns {String} cmd
  */
 function getWinCmd(projectName, container) {
-    const dockerComposeCmd = `\"${dockerComposePath}\"`;
+    // const dockerComposeCmd = `\"${dockerComposePath}\"`;
+    const dockerComposeCmd = "docker compose"
     return `start cmd.exe /K "cd /d ${getStackPath(
         projectName
     )} && ${dockerComposeCmd} exec ${container} bash"`;

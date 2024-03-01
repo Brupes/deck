@@ -29,9 +29,13 @@ export default function down(project) {
                         rimraf(getStackPath(project), function () {
                             let isRemoved = removeProject(project);
                             if (isRemoved) {
-                                // @TODO: Will remove this comment when list work after remove stack/project
-                                // nominalProjectStore.set(getNominalProjectList());
-                                // projectStore.set(getProjects());
+                                const { ipcRenderer } = require("electron");
+                                ipcRenderer.send("register-proxy", {
+                                    action: "unregister",
+                                    args: {
+                                        stack: project
+                                    },
+                                });
                                 nominalProjectStore.update((result) => {
                                     _.remove(result, function (obj) {
                                         return (

@@ -69,7 +69,7 @@ export const getStackStatus = function (stackName) {
             dockerode.listContainers(
                 {
                     filters: {
-                        name: [stackName],
+                        name: [`/${stackName}-`],
                         status: ["exited", "running", "dead", "paused"],
                     },
                 },

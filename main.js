@@ -235,6 +235,13 @@ ipcMain.on("register-proxy", async (event, data) => {
             data.args.stack + domain,
             `http://${host}:${data.args.port}`
         );
+    } else if (_.has(data, "action") && data.action == "unregister") {
+        let host = _.has(dockerEngine, "host")
+            ? dockerEngine.host
+            : "localhost";
+        proxy.unregister(
+            data.args.stack + domain
+        );
     } else {
         logger.log("Unknown message from parent: ", data);
     }

@@ -95,7 +95,7 @@ export async function getDockerEngine() {
     let defaultSettings = getDefaultSettings();
     let settings = await getSettingValue("settings.dockerEngine");
     //TODO: force remote engine to false
-    settings.remoteEngine = undefined;
+    _.set(settings, 'remoteEngine', false)
     if (!_.get(settings, "remoteEngine", false)) {
         await setSettingValue(
             "settings.dockerEngine.remoteEngine",

@@ -8,9 +8,9 @@ let dockerode = require("dockerode");
  * @returns dockerode object
  */
 export async function getDockerodeObject() {
-    let params = await getDockerParams();
+    // let params = await getDockerParams();
     
-    return new dockerode(params);
+    return new dockerode();
 }
 
 /**

@@ -3,6 +3,7 @@ const network = "deck-app";
 
 export async function createDefaultNetwork() {
     let docker = await getDockerodeObject();
+    
     docker
         .createNetwork({
             Name: network,

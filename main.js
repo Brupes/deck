@@ -20,6 +20,8 @@ let tray = null;
 let mainWindow;
 let forceQuit = false;
 let proxy;
+let stacks = [];
+let host = 'localhost';
 
 require('@electron/remote/main').initialize()
 logger.initialize();
@@ -213,14 +215,19 @@ ipcMain.handle("power-saving", async (event, arg) => {
 
 ipcMain.on("register-proxy", async (event, data) => {
     let dockerEngine = await config.get("settings.dockerEngine");
+    host = _.has(dockerEngine, "host")
+        ? dockerEngine.host
+        : "localhost";
+
     logger.log("Receiving proxy args from renderer");
     logger.log(data); // prints "ping"
-    logger.log(`http://${dockerEngine.host}:`);
+    logger.log(`http://${host}:`);
     if (_.has(data, "action") && data.action == "init") {
         let http = await isPortReachable(80, { host: "localhost" });
         let https = await isPortReachable(443, { host: "localhost" });
 
         if (http === false && https === false) {
+            stacks = data.args.stacks;
             initialize(data.args.path);
             register(data.args.stacks);
             logger.log("Registering proxies");
@@ -228,17 +235,18 @@ ipcMain.on("register-proxy", async (event, data) => {
             logger.log("ERR: port 80 & 443 are blocked");
         }
     } else if (_.has(data, "action") && data.action == "register") {
-        let host = _.has(dockerEngine, "host")
-            ? dockerEngine.host
-            : "localhost";
+        if (!stacks.includes(data.args.stack)) {
+            stacks.push({
+                COMPOSE_PROJECT_NAME: data.args.stack,
+                STACK_HTTP_PORT: data.args.port,
+            })
+        }
         proxy.register(
             data.args.stack + domain,
             `http://${host}:${data.args.port}`
         );
     } else if (_.has(data, "action") && data.action == "unregister") {
-        let host = _.has(dockerEngine, "host")
-            ? dockerEngine.host
-            : "localhost";
+        stacks = stacks.filter((el) => el.COMPOSE_PROJECT_NAME !== data.args.stack)
         proxy.unregister(
             data.args.stack + domain
         );
@@ -277,10 +285,26 @@ ipcMain.handle('setSettingValue', (event, ...args) => {
     return config.set(...args);
 });
 
+function wildcardResolver(proxyHost, url, req) {
+    for (const stack of stacks) {
+        if (proxyHost.endsWith(`.${stack.COMPOSE_PROJECT_NAME}.stacks.run`)) {
+            return {
+                url: [
+                    `http://${host}:${stack.STACK_HTTP_PORT}`
+                ]
+            }
+        }
+    }
+    return null;
+}
+
 function initialize(path) {
     logger.log("Received path ", path);
     proxy = require("redbird")({
         port: 80,
+        resolvers: [
+            wildcardResolver
+        ],
         ssl: {
             port: 443,
             key: `${path}/storage/certs/dev-key.pem`,

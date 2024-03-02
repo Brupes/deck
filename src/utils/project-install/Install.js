@@ -45,6 +45,7 @@ export default async function saveNewProject(data, image, settings) {
 
     // Set project ENV
     let envData = await setProjectEnv(stackName, settings, data);
+    _.set(data, "project_path", _.get(envData.ENV, "APP_CODE_PATH_HOST", _.get(data, "project_path", "")))
 
     // Save project on stack file for listing
     await saveProjectOnStackFile(stackName, image, envData, data);

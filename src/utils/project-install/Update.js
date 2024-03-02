@@ -21,7 +21,8 @@ export async function updateProject(stackName, data) {
 
         // Set project ENV
         let envData = await updateProjectEnv(stackName, settings, data);
-
+        _.set(data, "project_path", _.get(envData.ENV, "APP_CODE_PATH_HOST", _.get(data, "project_path", "")))
+        
         let stack = getProjects(stackName);
         let image = getStacks(stack.AppID);
 

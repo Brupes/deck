@@ -1,25 +1,28 @@
 <script>
     import _ from "lodash";
     import { projectStore } from "../../utils/store/Projects";
-    import { isComposerDependant, hasLaravelInstalled } from "./Tools";
+    import { isComposerDependant, hasLaravelInstalled, isNpmDependant } from "./Tools";
     import Button from "../../components/tools/Button.svelte";
 
     export let projectName;
 
-    let project, hasComposer, hasLaravel, execInProgress;
+    let project, hasNpm, hasComposer, hasLaravel, execInProgress;
 
     $: {
         project = $projectStore.find(
-            (item) => item.COMPOSE_PROJECT_NAME === projectName
+            (item) => item.COMPOSE_PROJECT_NAME === projectName,
         );
-
+        
         if (_.get(project, "APP_CODE_PATH_HOST", false)) {
             (async () => {
+                hasNpm = await isNpmDependant(
+                    project.APP_CODE_PATH_HOST,
+                );
                 hasComposer = await isComposerDependant(
-                    project.APP_CODE_PATH_HOST
+                    project.APP_CODE_PATH_HOST,
                 );
                 hasLaravel = await hasLaravelInstalled(
-                    project.APP_CODE_PATH_HOST
+                    project.APP_CODE_PATH_HOST,
                 );
             })();
         }
@@ -50,7 +53,7 @@
 </script>
 
 {#if _.get(project, "APP_CODE_PATH_HOST", false)}
-    <div class={hasComposer ? "visible" : "hidden"}>
+    <div class={hasComposer || hasNpm || hasLaravel ? "visible" : "hidden"}>
         <dl
             class="bg-gray-50 shadow-sm rounded-lg p-4 inline-flex flex-col w-full h-fit-content gap-2 break-inside mb-6"
         >
@@ -74,8 +77,10 @@
             <div class="text-gray-400 text-xs">
                 Run commands in the project by clicking on the buttons
             </div>
-            
-            <div class="flex flex-wrap gap-2 py-2">
+
+            <div class="flex flex-wrap gap-2 py-2 {hasNpm
+                ? 'visible'
+                : 'hidden'}">
                 {#each npmTools as npmTool}
                     <Button
                         cmd={npmTool}
@@ -84,7 +89,9 @@
                     />
                 {/each}
             </div>
-            <div class="flex flex-wrap gap-2 py-2">
+            <div class="flex flex-wrap gap-2 py-2 {hasComposer
+                ? 'visible'
+                : 'hidden'}">
                 {#each composerTools as composerTool}
                     <Button
                         cmd={composerTool}

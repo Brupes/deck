@@ -31,7 +31,6 @@ export function connections(projectName) {
 
                     let privateHostName = await getHost();
                     try {
-                        console.log(containers, projectName)
                         _.forEach(containers, function (container) {
                             console.log(
                                 "🚀 LOG | file: Container.js | line 38 | container",

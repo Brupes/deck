@@ -67,7 +67,6 @@
             h-full
             flex flex-col
             relative
-            overflow-hidden
         "
     >
         <!-- stack header -->
@@ -78,7 +77,7 @@
         />
 
         <!-- stack details -->
-        <div class="p-6 mb-8 overflow-y-auto rounded-md">
+        <div class="p-6 mb-8 rounded-md">
             <!-- connections -->
             <div class="mb-6">
                 <dl

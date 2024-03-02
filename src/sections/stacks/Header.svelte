@@ -7,6 +7,7 @@
 
     import _ from "lodash";
     import { createEventDispatcher } from "svelte";
+    import { router, meta } from "tinro";
     import Indicator from "./Indicator.svelte";
     import { updateProject } from "../../utils/project-install/Update";
     import restart from "./../../utils/docker/Restart";
@@ -52,15 +53,13 @@
 
     $: {
         if (_.get($defaultEditorStore, "editor", "")) {
-            canShowVSCode = window.sessionStorage.getItem(
-                "canShowVSCode_" + projectName
-            );
+            canShowVSCode = true;
 
             // Remove open vs code button if app code path not found
             if (_.get(stackObject, "APP_CODE_PATH_HOST", "") === "") {
                 canShowVSCode = false;
             }
-
+            
             if ($isFormUpdated) {
                 canShowVSCode = false;
             }
@@ -111,7 +110,7 @@
                             dispatch("stackUpdate", {
                                 status: false,
                             });
-                        }
+                        },
                     );
                 },
                 (err) => {
@@ -122,7 +121,7 @@
                     dispatch("stackUpdate", {
                         status: false,
                     });
-                }
+                },
             );
         } else {
             $headerLoaderStore.loading = false;
@@ -203,7 +202,7 @@
                     <button
                         on:click={() => {
                             shell.openExternal(
-                                `https:${projectName}.stacks.run`
+                                `https:${projectName}.stacks.run`,
                             );
                         }}
                         class="flex flex-none items-center justify-start gap-3"

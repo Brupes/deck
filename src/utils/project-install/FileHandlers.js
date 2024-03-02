@@ -202,7 +202,7 @@ export async function saveProjectOnStackFile(stackName, image, envData, data) {
         STACK_HTTP_PORT: httpPort,
         PMA_PORT: null,
     };
-
+    
     // Add new project on project.json file
     addNewProject(stackData);
 
@@ -302,6 +302,13 @@ export async function updateProjectOnStackFile(
 
     // Update project.json file
     updateProject(stackName, stackData);
+    
+    // Update stack store
+    projectStore.update(function (stacks) {
+        stacks = stacks.filter((el) => el.COMPOSE_PROJECT_NAME !== stackData.COMPOSE_PROJECT_NAME)
+        stacks.push(stackData);
+        return stacks;
+    });
 
     return stackData;
 }

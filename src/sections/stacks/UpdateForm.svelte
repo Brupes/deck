@@ -49,9 +49,12 @@
         if (isStackUpdated) {
             isStackUpdated = false;
             getDefaultFormValue(projectName).then((res) => {
-                compareObject = getFormValueByFormFields(res);
+                formValue = compareObject = getFormValueByFormFields(res);
             });
         }
+    }
+
+    $: {
         // Update the status for save button should enable or disable
         isFormUpdated.update(() => !_.isEqual(compareObject, formValue));
 

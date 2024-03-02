@@ -1,5 +1,17 @@
 const fs = require('fs');
 
+export async function isNpmDependant(path) {
+    //Does the project have a package.json?
+    try {
+        const composer = path + '/package.json';
+        await fs.promises.access(composer);
+        
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
 export async function isComposerDependant(path) {
     //Does the project have a compose.json?
     try {

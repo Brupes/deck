@@ -6,7 +6,7 @@
     import Announcement from "./Announcement.svelte";
 
     const { ipcRenderer } = require("electron");
-    const reportLink = "https://github.com/sfx101/deck/issues/new";
+    const reportLink = "https://github.com/Brupes/deck/issues/new";
 
     let appVersion = "v1.0.0";
 
@@ -204,9 +204,9 @@
                 </button>
             </nav>
         </div>
-        <div class="flex-shrink-0 flex justify-center pb-5">
+        <!-- <div class="flex-shrink-0 flex justify-center pb-5">
             <Announcement />
-        </div>
+        </div> -->
         <div class="flex-shrink-0 flex py-1 bg-chillgray-700">
             <p class="text-center mx-auto text-xs text-white font-medium">
                 {appVersion}

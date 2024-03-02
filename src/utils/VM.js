@@ -6,6 +6,7 @@ import { settingsStore } from "./store/Settings";
 import { isEmptyDir } from "../utils/Utils";
 import _ from "lodash";
 import { getMountPath } from "../utils/Mount";
+import run from "./RunCommand";
 
 const os = require("os");
 const path = require("path");
@@ -82,7 +83,15 @@ export function getWinVmPath(localPath, projectName) {
                         }
                     );
                 } else {
-                    resolve(localPath);
+                    fixFolderLocation(localPath, projectName).then(
+                        (res) => {
+                            console.log(`🚀 LOG | file: VM.js | line 86 | res`, res)
+                            resolve(_.get(res, "path", false));
+                        },
+                        (err) => {
+                            reject(err);
+                        }
+                    );
                     // reject('The selected project path is not empty, select an empty path');
                     // let path1 = getLocalDriveToWslMntPath(localPath);
                     // let path2 =
@@ -127,39 +136,30 @@ export function getLocalDriveToWslMntPath(localPath) {
  * @param {String} projectName
  * @returns {Promise} envPath
  */
-function createSymlink(localPath, projectName) {
+function createSymlink(localPathRaw, projectName) {
     return new Promise(async function (resolve, reject) {
         let options = {
             name: "DECK"
         };
+        let localPath = localPathRaw
+        if (localPath.startsWith('\\\\wsl.localhost\\')) {
+            localPath = `\\\\wsl$\\${localPath.substring('\\\\wsl.localhost\\'.length)}`
+        }
         // let returnData = "/" + ["home", "deck-projects", projectName].join("/");
         const newPath = `\\\\wsl$\\deck-app\\home\\deck-projects\\${projectName}`
         const returnData = newPath
 
-        if (localPath.startsWith('\\\\wsl$\\deck-app') && localPath !== newPath) {
-            let command =
-                `wsl -d deck-app mv "${localPath}" "${newPath}"`;
+        if (localPath.startsWith('\\\\wsl$\\') && localPath !== newPath) {
+            console.log(`🚀 LOG | file: VM.js | line 144 | nothing to do for now`, localPath, newPath)
 
-            sudo.exec(
-                command,
-                options,
-                function (error, stdout, stderr) {
-                    if (error) {
-                        reject({
-                            message: "Something is wrong, mv failed.",
-                            data: error
-                        });
-                    } else {
-                        resolve({
-                            message: "Folder successfully moved.",
-                            path: returnData,
-                            status: 100
-                        });
-                    }
-                }
-            );
+            resolve({
+                message: "Nothig done. Keeping as it is",
+                path: returnData,
+                status: 100
+            });
         }
         else {
+            console.log(`🚀 LOG | file: VM.js | line 168 | creating shortcut`, localPath, newPath)
             let command =
                 `mklink /D "${localPath}" "${newPath}"`;
 
@@ -191,6 +191,89 @@ function createSymlink(localPath, projectName) {
                     data: deleteFolderStatus,
                 });
             }
+        }
+    });
+}
+
+function fixFolderLocation(localPathRaw, projectName) {
+    return new Promise(async function (resolve, reject) {
+        let options = {
+            name: "DECK"
+        };
+        let localPath = localPathRaw
+        if (localPath.startsWith('\\\\wsl.localhost\\')) {
+            localPath = `\\\\wsl$\\${localPath.substring('\\\\wsl.localhost\\'.length)}`
+        }
+
+        const newPath = `\\\\wsl$\\deck-app\\home\\deck-projects\\${projectName}`
+        let returnData = newPath
+
+        if (localPath.startsWith('\\\\wsl$\\') && localPath !== newPath) {
+            console.log(`🚀 LOG | file: VM.js | line 218 | moving project`, localPath, newPath)
+
+            let regex = /(?:\\\\wsl\$\\)([^\\]*)(.*)/g
+            var match = regex.exec(localPath);
+            const fromDistro = match[1]
+            const fromPath = match[2].replaceAll('\\', '/')
+
+            regex = /(?:\\\\wsl\$\\)([^\\]*)(.*)/g
+            match = regex.exec(newPath);
+            const toDistro = match[1]
+            const toPath = match[2].replaceAll('\\', '/')
+
+            let command = `wsl -d ${fromDistro} -- rm -rf "/mnt/wsl/deck-temp-${projectName}" \`&\`& mv "${fromPath}/" "/mnt/wsl/deck-temp-${projectName}"`
+
+            run(command, undefined, false).then((ptyProcess) => {
+                ptyProcess.on("exit", async (code) => {
+                    if (code === 0) {
+                        let command = `wsl -d ${toDistro} -- rm -rf "${toPath}" \`&\`& mv "/mnt/wsl/deck-temp-${projectName}/" "${toPath}"`
+
+                        console.log(command)
+                        run(command, undefined, false).then((ptyProcess) => {
+                            ptyProcess.on("exit", async (code) => {
+                                if (code === 0) {
+                                    resolve({
+                                        message: "Folder successfully moved.",
+                                        path: returnData,
+                                        status: 100
+                                    });
+                                } else {
+                                    reject({
+                                        message: "Something is wrong, move failed.",
+                                        data: error
+                                    });
+                                }
+                            });
+                        },
+                            (error) => {
+                                reject({
+                                    message: "Something is wrong, move failed.",
+                                    data: error
+                                });
+                            })
+                    } else {
+                        reject({
+                            message: "Something is wrong, move failed.",
+                            data: error
+                        });
+                    }
+                });
+            },
+                (error) => {
+                    reject({
+                        message: "Something is wrong, move failed.",
+                        data: error
+                    });
+                })
+        }
+        else {
+            console.log(`🚀 LOG | file: VM.js | line 242 | nothing to do for now`, localPath, newPath)
+
+            resolve({
+                message: "Nothig done. Keeping as it is",
+                path: localPath,
+                status: 100
+            });
         }
     });
 }
